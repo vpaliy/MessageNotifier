@@ -26,7 +26,7 @@ public class MessageReceiver extends BroadcastReceiver {
             Log.d(TAG(this),"Received");
             List<SmsMessage> messageList=convertToSms(intent.getExtras());
             if(messageList!=null) {
-                MessageHandler.buildWith(context,messageList);
+                MessageHandler.buildHandler(context,messageList).handle();
             }
         }
 
