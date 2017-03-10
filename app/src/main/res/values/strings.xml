@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">MorseNotifier</string>
+    <string name="shPreferences">com.vpaliy.MorseNotifier.SharedPreferences</string>
 </resources>

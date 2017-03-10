@@ -6,10 +6,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.telephony.SmsMessage;
 import android.util.Log;
-
 import com.vpaliy.morsenotifier.domain.MessageHandler;
-import com.vpaliy.morsenotifier.utils.ProjectUtils;
-
 import java.util.LinkedList;
 import java.util.List;
 

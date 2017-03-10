@@ -2,21 +2,23 @@ package com.vpaliy.morsenotifier.domain.converter;
 
 import android.support.annotation.NonNull;
 
+import com.vpaliy.morsenotifier.domain.model.ConvertModel;
 import com.vpaliy.morsenotifier.domain.wrapper.TransformWrapper;
-
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Collections;
+import java.util.List;
 
 public class MorseConverter<T extends TransformWrapper> extends Converter<T> {
 
     private final T transformWrapper;
+
+    private final List<ConvertModel> convertModelList;
 
     private static final int DOTS_IN_DASH       = 3;
     private static final int DOTS_IN_GAP        = 1;
     private static final int DOTS_IN_LETTER_GAP = 3;
     private static final int DOTS_IN_WORD_GAP   = 7;
 
-    private static final String      CHARSET_MORSE  = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.,?'!/()&:;=+-_\"$@";
+    private static final String  CHARSET_MORSE  = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.,?'!/()&:;=+-_\"$@";
 
     private static final boolean     DOT  = true;
     private static final boolean     DASH = false;
@@ -78,8 +80,13 @@ public class MorseConverter<T extends TransformWrapper> extends Converter<T> {
             {DOT, DASH, DASH, DOT, DASH, DOT} //@
     };
 
-    public MorseConverter(@NonNull T wrapper) {
+    public MorseConverter(@NonNull T wrapper, @NonNull List<ConvertModel> convertModelList) {
         this.transformWrapper=wrapper;
+        this.convertModelList=convertModelList;
+    }
+
+    public MorseConverter(@NonNull T wrapper, @NonNull ConvertModel convertModel) {
+        this(wrapper, Collections.singletonList(convertModel));
     }
 
     @Override
