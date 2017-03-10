@@ -2,7 +2,6 @@ package com.vpaliy.morsenotifier.domain.model;
 
 import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
-import android.support.v4.app.NotificationCompat;
 
 public class ConvertModel {
 

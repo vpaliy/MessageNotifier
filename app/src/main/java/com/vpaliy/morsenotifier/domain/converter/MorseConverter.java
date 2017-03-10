@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 import com.vpaliy.morsenotifier.domain.model.ConvertModel;
 import com.vpaliy.morsenotifier.domain.wrapper.TransformWrapper;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 public class MorseConverter<T extends TransformWrapper> extends Converter<T> {
@@ -13,10 +14,13 @@ public class MorseConverter<T extends TransformWrapper> extends Converter<T> {
 
     private final List<ConvertModel> convertModelList;
 
-    private static final int DOTS_IN_DASH       = 3;
-    private static final int DOTS_IN_GAP        = 1;
-    private static final int DOTS_IN_LETTER_GAP = 3;
-    private static final int DOTS_IN_WORD_GAP   = 7;
+    private static final long DOTS_IN_DASH       = 3;
+    private static final long DOTS_IN_GAP        = 1;
+    private static final long DOTS_IN_LETTER_GAP = 3;
+    private static final long DOTS_IN_WORD_GAP   = 7;
+
+    private static final long DOTS=1;
+    private static final long DASHES=2;
 
     private static final String  CHARSET_MORSE  = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.,?'!/()&:;=+-_\"$@";
 
@@ -94,9 +98,46 @@ public class MorseConverter<T extends TransformWrapper> extends Converter<T> {
         return 0;
     }
 
-    public void convert() {
+    private List<Long> convertWord(@NonNull String word, @NonNull ConvertModel model) {
+        List<Long> durations=new LinkedList<>();
+        for(int index=0;index<word.length();index++) {
+            int jIndex=CHARSET_MORSE.indexOf(word.charAt(index));
+            if(jIndex>=0) {
+                boolean[] wordTable=MORSE[jIndex];
+                jIndex=0;
+                while(jIndex<=wordTable.length-1) {
+                    durations.add(wordTable[jIndex++]?DOTS_IN_DASH:DOTS_IN_GAP);
+                    if(jIndex<wordTable.length) {
+                        durations.add(DOTS_IN_LETTER_GAP);
+                    }
+                }
+            }
+        }
+        return durations;
     }
 
+    private long[] convertToArray(List<Long> durations) {
+        long[] result=new long[durations.size()];
+        for(int index=0;index<durations.size();index++) {
+            result[index]=durations.get(index);
+        }
+        return result;
+    }
+
+    public void convert() {
+        List<Long> durations=new LinkedList<>();
+        for(ConvertModel convertModel:convertModelList) {
+            String message=convertModel.getMessage();
+            String[] words=message.toUpperCase().trim().split(" ");
+            if(words.length!=0) {
+                for(String word:words) {
+                    durations.addAll(convertWord(word,convertModel));
+                }
+            }
+        }
+        //
+        transformWrapper.transform(convertToArray(durations));
+    }
 
 
 }
