@@ -1,9 +1,12 @@
 package com.vpaliy.morsenotifier.domain.converter;
 
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.vpaliy.morsenotifier.domain.model.ConvertModel;
 import com.vpaliy.morsenotifier.domain.wrapper.TransformWrapper;
+import com.vpaliy.morsenotifier.utils.ProjectUtils;
+
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -19,8 +22,6 @@ public class MorseConverter<T extends TransformWrapper> extends Converter<T> {
     private static final long DOTS_IN_LETTER_GAP = 3;
     private static final long DOTS_IN_WORD_GAP   = 7;
 
-    private static final long DOTS=1;
-    private static final long DASHES=2;
 
     private static final String  CHARSET_MORSE  = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.,?'!/()&:;=+-_\"$@";
 
@@ -98,19 +99,28 @@ public class MorseConverter<T extends TransformWrapper> extends Converter<T> {
         return 0;
     }
 
-    private List<Long> convertWord(@NonNull String word, @NonNull ConvertModel model) {
+    private List<Long> convertWord(@NonNull String word,long dot) {
         List<Long> durations=new LinkedList<>();
+
+        final long dash=dot*DOTS_IN_DASH;
+        final long letterGap = dot * DOTS_IN_LETTER_GAP;
+        final long gap       = dot * DOTS_IN_GAP;
+
         for(int index=0;index<word.length();index++) {
             int jIndex=CHARSET_MORSE.indexOf(word.charAt(index));
             if(jIndex>=0) {
                 boolean[] wordTable=MORSE[jIndex];
                 jIndex=0;
                 while(jIndex<=wordTable.length-1) {
-                    durations.add(wordTable[jIndex++]?DOTS_IN_DASH:DOTS_IN_GAP);
+                    durations.add(wordTable[jIndex++]?dot:dash);
                     if(jIndex<wordTable.length) {
-                        durations.add(DOTS_IN_LETTER_GAP);
+                        durations.add(gap);
                     }
                 }
+            }
+
+            if(index<word.length()) {
+                durations.add(letterGap);
             }
         }
         return durations;
@@ -127,17 +137,21 @@ public class MorseConverter<T extends TransformWrapper> extends Converter<T> {
     public void convert() {
         List<Long> durations=new LinkedList<>();
         for(ConvertModel convertModel:convertModelList) {
+            final long dot=convertModel.getFrequency()*200;
+            final long wordGap   = dot * DOTS_IN_WORD_GAP;
             String message=convertModel.getMessage();
             String[] words=message.toUpperCase().trim().split(" ");
             if(words.length!=0) {
-                for(String word:words) {
-                    durations.addAll(convertWord(word,convertModel));
+                for(int index=0;index<words.length;index++) {
+                    durations.addAll(convertWord(words[index],dot));
+                    if(index<words.length) {
+                        durations.add(wordGap);
+                    }
                 }
             }
         }
         //
+        Log.d(ProjectUtils.TAG(this),Integer.toString(durations.size()));
         transformWrapper.transform(convertToArray(durations));
     }
-
-
 }

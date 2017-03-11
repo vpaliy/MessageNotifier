@@ -1,7 +1,6 @@
 package com.vpaliy.morsenotifier.domain.wrapper;
 
 import android.content.Context;
-import android.media.AudioAttributes;
 import android.os.Vibrator;
 import android.support.annotation.NonNull;
 
@@ -15,7 +14,8 @@ public class VibratorWrapper extends TransformWrapper {
     }
 
     public void transform(long[] durations) {
-        vibrator.vibrate(durations,-1);
+         vibrator.vibrate(durations,-1);
+
     }
 
 }
